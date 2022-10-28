@@ -10,4 +10,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="border"> #808080 </color>
     <color name="myblue"> #2196F3</color>
+    <color name="lightpink">#C8F780AA</color>
 </resources>
