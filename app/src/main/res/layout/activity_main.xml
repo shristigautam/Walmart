@@ -45,13 +45,13 @@
         android:textSize="16sp" />
 
     <EditText
-        android:id="@+id/editTextTextPersonName3"
+        android:id="@+id/editTextEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/edit_text_background"
         android:padding="10dp"
         android:ems="10"
-        android:inputType="textPersonName"
+        android:inputType="textEmailAddress"
         android:singleLine="false" />
 
     <TextView
@@ -66,17 +66,17 @@
 
 
     <EditText
-        android:id="@+id/editTextTextPersonName5"
+        android:id="@+id/editTextPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/edit_text_background"
         android:ems="10"
-        android:inputType="textPersonName"
+        android:inputType="textPassword"
         android:padding="10dp"
         android:password="true" />
 
     <TextView
-        android:id="@+id/textView9"
+        android:id="@+id/textViewForgot"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:autoLink="all"
@@ -87,7 +87,7 @@
         android:textColor="@color/myblue" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/signInButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
@@ -136,18 +136,16 @@
 
     <!-- uses border -->
     <Button
-        android:id="@+id/button3"
-
-
+        android:id="@+id/createUserButton"
         android:background="@color/purple_700"
         app:backgroundTint="@android:color/transparent"
         android:textColor="#2196F3"
-
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Create a new account"
         android:textAllCaps="false"
         android:textSize="16sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        />
 
 </LinearLayout>

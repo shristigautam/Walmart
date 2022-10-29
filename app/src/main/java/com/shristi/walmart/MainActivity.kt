@@ -1,97 +1,101 @@
-package com.miu.mdp
+package com.shristi.walmart
 
 import android.app.Activity
-import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import com.shristi.walmart.model.UserAccount
+import android.view.View
+import android.widget.EditText
 import android.widget.Toast
-import androidx.activity.result.ActivityResultCallback
-import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.appcompat.app.AppCompatActivity
-import com.miu.mdp.model.User
-import com.miu.mdp.register.RegisterActivity
-import com.miu.mdp.shopping.ShoppingCategoryActivity
+import androidx.activity.result.contract.ActivityResultContracts
 import kotlinx.android.synthetic.main.activity_main.*
 
-
 class MainActivity : AppCompatActivity() {
-
-    private val usersList = mutableListOf(
-        User("Sujan", "Lama", "sujan@gmail.com", "123456"),
-        User("Jane", "Doe", "janedoe@gmail.com", "123456"),
-        User("John", "Smith", "johnsmith@gmail.com", "123456"),
-        User("Jane", "Smith", "janesmith@gmail.com", "123456"),
-        User("John", "Doe", "johndoe@gmail.com", "123456")
+    var userList: ArrayList<UserAccount> = arrayListOf<UserAccount>(
+        UserAccount("Shristi", "Gautam", "shristigautam@miu.edu", "Shristi123"),
+        UserAccount("Renuka", "Mohanraj", "rmohanraj@miu.edu", "Rm123"),
+        UserAccount("Computer", "Careers", "computercareers@miu.edu", "Cc123"),
+        UserAccount("Ram", "Bahadur", "rbahadur@gmail.com", "Rb123"),
+        UserAccount("Sita", "Kumari", "skumari@gmail.com", "Sk123"),
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        forgotPasswordTextView.setOnClickListener {
-            if (emailEditText.text.toString().isEmpty()) {
-                emailEditText.error = "Email is required"
-                Toast.makeText(this, "Email is required", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            val user = usersList.find { it.username == emailEditText.text.toString() }
-            if (user == null) {
-                Toast.makeText(this, "User not found", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-            val intent = Intent(Intent.ACTION_SEND)
-            intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(user.username))
-            intent.putExtra(Intent.EXTRA_SUBJECT, "Password Recovery")
-            intent.putExtra(Intent.EXTRA_TEXT, "Your password is ${user.password}")
-            intent.type = "message/rfc822"
-            try {
-                startActivity(intent)
-            } catch (e: ActivityNotFoundException) {
-                Toast.makeText(this, "No email app found", Toast.LENGTH_LONG).show()
-            }
-        }
+        var email: String = editTextEmail.text.toString().trim()
+        var userAccount: UserAccount? = userList.find { s -> s.userEmail == email }
 
         signInButton.setOnClickListener {
-            if (emailEditText.text.toString().isEmpty()) {
-                emailEditText.error = "Email is required"
-                Toast.makeText(this, "Email is required", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+            //removing whitespace and getting email and password
+            var email: String = editTextEmail.text.toString().trim()
+            var password: String = editTextPassword.text.toString().trim()
+            println(email)
+            println(password)
+            if (email.isNullOrEmpty()) {
+                editTextEmail.error = "Please enter a valid email!"
+            } else
+                if (password.isNullOrEmpty()) {
+                    editTextPassword.error = "Please enter a valid password!"
+                }
+
+            if (!verifyUser(email, password)) {
+                Toast.makeText(this, "User does not exist.", Toast.LENGTH_LONG).show()
+            } else {
+                val intent = Intent(this, ShoppingCategoryActivity::class.java)
+                intent.putExtra("email", email)
+                startActivity(intent);
             }
 
-            if (passwordEditText.text.toString().isEmpty()) {
-                passwordEditText.error = "Password is required"
-                Toast.makeText(this, "Password is required", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val user = usersList.find {
-                it.username == emailEditText.text.toString() && it.password == passwordEditText.text.toString()
-            }
-            if (user != null) {
-                Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show()
-                startActivity(ShoppingCategoryActivity.newInstance(this, user.username))
-                return@setOnClickListener
-            }
-            Toast.makeText(
-                this,
-                "Login Failed. Please check your email and password",
-                Toast.LENGTH_SHORT
-            ).show()
         }
 
-        val resultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data = result.data
-                val user = data?.getParcelableExtra<User>("user") as User
-                usersList.add(user)
-                Log.d("MainActivity", "userList: $usersList")
-                Toast.makeText(this, "Account Created Successfully", Toast.LENGTH_SHORT).show()
+
+
+        textViewForgot.setOnClickListener {
+            if (email.isNullOrEmpty()) {
+                editTextEmail.error = "Invalid email !"
+                return@setOnClickListener
             }
+            //Email
+            val intent = Intent(Intent.ACTION_SENDTO).apply {
+                type = "*/*"    //"text/plain"
+                data = Uri.parse("mailto:shristigautam@miu.edu")
+                putExtra(Intent.EXTRA_SUBJECT, "Here is your password!")
+                putExtra(Intent.EXTRA_TEXT, "Your password is :" + userAccount?.password)
+            }
+            startActivity(intent)
         }
-        createAccountButton.setOnClickListener {
-            resultLauncher.launch(RegisterActivity.newInstance(this))
+
+
+
+        val resultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val data = result.data
+                    val user = data?.getSerializableExtra("user") as UserAccount
+                    if (userAccount != null) userList.add(user)
+                    Toast.makeText(
+                        this,
+                        "User account created successfully!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                } else {
+                    Toast.makeText(this, "Error creating user!", Toast.LENGTH_LONG).show()
+                }
+            }
+
+        createUserButton.setOnClickListener {
+            val intent = Intent(this, RegisterActivity::class.java)
+//            startActivity(intent);
+            resultLauncher.launch(intent)
         }
+
+
+    }
+
+    fun verifyUser(email: String, password: String): Boolean {
+        return userList.contains(UserAccount("", "", email, password))
     }
 }
